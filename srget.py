@@ -17,10 +17,9 @@ class Downloader():
     def connect(self):
         self.socket = socket(AF_INET,SOCK_STREAM)
         self.socket.connect((self.url,self.port))
-    def GetHeader(self):
-        if "connect" == Argument:
-            self.header = "GET /auth HTTP/1.1\r\n"
-            self.header += "id: {}\r\n".format(self.id)
+    def Getheader(self):
+        self.header = "GET /auth HTTP/1.1\r\n"
+        self.header += "{}:{}\r\n".format(self.url, self.port)
     def input_splitter(self,url):
         self.FileName = url[2]
         temp_url = url[3]
@@ -29,7 +28,7 @@ class Downloader():
         else:
             self.url = temp_url
 
-    def Recv(self):
+    def recv(self):
         data = ""
         while True:
             buff = self.socket.recv(4068)
@@ -46,12 +45,24 @@ class Downloader():
                 cl = fields.split(":")[-1]
                 self.contentLength = int(cl)
 
-    def WriteFile(self):
+    def file_write(self):
         if not os.path.exists(self.path):
             os.makedirs(self.path)
 
         with open(os.path.join(path, self.FileName), 'wb') as f:
                 f.write(self.data)
+                f.close()
+    def DownExec(self,argument):
+        s = Downloader()
+        s.input_splitter(argument)
+        s.connect()
+        s.datasize()
+        s.recv()
+        s.file_write()
+
+if __name__ == '__main__':
+    start = sys.argv
+    A = Downloader()
 
 
 
