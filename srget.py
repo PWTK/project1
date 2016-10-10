@@ -17,7 +17,7 @@ class Downloader():
     def connect(self):
         self.socket = socket(AF_INET,SOCK_STREAM)
         self.socket.connect((self.url,self.port))
-    def Getheader(self):
+    def send_request(self):
         self.header = "GET /auth HTTP/1.1\r\n"
         self.header += "{}:{}\r\n".format(self.url, self.port)
     def input_splitter(self,url):
@@ -56,8 +56,9 @@ class Downloader():
         s = Downloader()
         s.input_splitter(argument)
         s.connect()
-        s.datasize()
+        s.send_request()
         s.recv()
+        s.datasize()
         s.file_write()
 
 if __name__ == '__main__':
