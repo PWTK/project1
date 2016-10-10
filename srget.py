@@ -4,9 +4,7 @@ from socket import socket,AF_INET,SOCK_STREAM
 
 class Downloader():
     def __init__(self):
-        self.DefaultPort = 80
         self.url = ""
-        self.token = ""
         self.socket = socket(AF_INET,SOCK_STREAM)
         self.header = ""
         self.FileName = ""
@@ -14,6 +12,7 @@ class Downloader():
         self.path =  "/Users/JarHan/Downloads"
         self.numConn = 5
         self.contentLength = 0
+        self.port = 80
     def connect(self):
         self.socket = socket(AF_INET,SOCK_STREAM)
         self.socket.connect((self.url,self.port))
@@ -22,11 +21,13 @@ class Downloader():
         self.header += "{}:{}\r\n".format(self.url, self.port)
     def input_splitter(self,url):
         self.FileName = url[2]
+
         temp_url = url[3]
-        if ":" in temp_url:
-            self.DefaultPort = temp_url.split(":")[-1]
-        else:
-            self.url = temp_url
+        # if temp_url.split():
+        #     self.DefaultPort = temp_url.split(":")[-1]
+        # else:
+        self.url = temp_url
+
 
     def recv(self):
         data = ""
@@ -50,8 +51,8 @@ class Downloader():
             os.makedirs(self.path)
 
         with open(os.path.join(path, self.FileName), 'wb') as f:
-                f.write(self.data)
-                f.close()
+            f.write(self.data)
+            f.close()
     def DownExec(self,argument):
         s = Downloader()
         s.input_splitter(argument)
@@ -64,6 +65,7 @@ class Downloader():
 if __name__ == '__main__':
     start = sys.argv
     A = Downloader()
+    A.DownExec(start)
 
 
 
