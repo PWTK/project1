@@ -31,6 +31,8 @@ class Downloader():
         print "Saving the file as: " + self.FileName
         temp = argument[-1]
         url = urlparse(temp)
+        if url.port != None:
+            self.port = url.port
         self.host = url.hostname
         self.pathdown = url.path
 
@@ -40,20 +42,25 @@ class Downloader():
         while True:
             buff = self.socket.recv(1024)
             header += buff
+
             if "\r\n\r\n" in header:
                 self.header, leftover =   header.split("\r\n\r\n")
                 data += leftover
-                print self.header
+                print "Header Recieved"
                 break
+
         with open((self.FileName), 'wb+') as f:
+
             if "Content-Length" in self.header:
                 self.datasize()
+
                 while self.content_length != len(data):
                     data_buff = self.socket.recv(1024)
                     data += data_buff
                     f.write(data)
                 f.close()
             else:
+
                 while True:
                     data_buff = self.socket.recv(1024)
                     print data_buff
