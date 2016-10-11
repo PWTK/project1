@@ -37,42 +37,41 @@ class Downloader():
     def recv(self):
         data = ""
         header = ""
-        print "Start Receiving file"
         while True:
-            print "Loop entering"
             buff = self.socket.recv(1024)
             header += buff
             if "\r\n\r\n" in header:
-                print "kao if nhoi si"
                 self.header, leftover =   header.split("\r\n\r\n")
                 data += leftover
                 print self.header
                 break
-        while True:
-            data_buff = self.socket.recv(1024)
-            if not data_buff:
-                print "exiting loop"
-                break
-            data += data_buff
         with open((self.FileName), 'wb+') as f:
-            f.write(data)
-            print "Data is" + data
-            f.close()
+            if "Content-Length" in self.header:
+                self.datasize()
+                while self.content_length != len(data):
+                    data_buff = self.socket.recv(1024)
+                    data += data_buff
+                    f.write(data)
+                f.close()
+            else:
+                while True:
+                    data_buff = self.socket.recv(1024)
+                    print data_buff
+                    if not data_buff:
+                        print "exiting loop"
+                        break
+                    data += data_buff
+                    f.write(data)
+                f.close()
         self.socket.close()
 
-    # def datasize (self):
-    #     header_list = self.header.split("\r\n")
-    #     for fields in header_list:
-    #         if "Content-Length" in fields:
-    #             cl = fields.split(":")[-1]
-    #             self.content_length = int(cl)
+    def datasize (self):
+        header_list = self.header.split("\r\n")
+        for fields in header_list:
+            if "Content-Length" in fields:
+                cl = fields.split(":")[-1]
+                self.content_length = int(cl)
 
-    # def file_write(self):
-    #     if not os.path.exists(self.path):
-    #         os.makedirs(self.path)
-    #     with open(os.path.join(self.path, self.FileName), 'wb') as f:
-    #         f.write(self.data)
-    #         f.close()
 
     def DownExec(self,argument):
         s = Downloader()
@@ -80,15 +79,10 @@ class Downloader():
         s.connect()
         s.send_request()
         s.recv()
-        s.datasize()
-        # s.file_write()
+
 
 if __name__ == '__main__':
     start = sys.argv
     A = Downloader()
     A.DownExec(start)
 
-
-
-
-# with ()
