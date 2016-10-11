@@ -49,28 +49,32 @@ class Downloader():
                 print "Header Recieved"
                 break
 
-        with open((self.FileName), 'wb+') as f:
-
+        with open((self.FileName), 'w') as f:
+            f.write(leftover)
             if "Content-Length" in self.header:
                 self.datasize()
-
-                while self.content_length != len(data):
+                data_total = len(leftover)
+                print self.content_length, data_total
+                while self.content_length > data_total:
                     data_buff = self.socket.recv(1024)
-                    data += data_buff
-                    f.write(data)
+                    f.write(data_buff)
+
+                    data_total += len(data_buff)
+                    print data_total
                 f.close()
             else:
-
+                total = 0
                 while True:
                     data_buff = self.socket.recv(1024)
-                    print data_buff
                     if not data_buff:
                         print "exiting loop"
                         break
-                    data += data_buff
-                    f.write(data)
+                    total += len(data_buff)
+                    f.write(data_buff)
                 f.close()
+                print "Download Complete"
         self.socket.close()
+
 
     def datasize (self):
         header_list = self.header.split("\r\n")
@@ -80,7 +84,7 @@ class Downloader():
                 self.content_length = int(cl)
 
 
-    def DownExec(self,argument):
+    def DownExecution(self,argument):
         s = Downloader()
         s.input_splitter(argument)
         s.connect()
@@ -91,5 +95,6 @@ class Downloader():
 if __name__ == '__main__':
     start = sys.argv
     A = Downloader()
-    A.DownExec(start)
+    A.DownExecution(start)
+
 
