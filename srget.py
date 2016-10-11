@@ -5,13 +5,12 @@ from urlparse import urlparse
 
 class Downloader():
     def __init__(self):
-        self.path = ""
+        self.pathdown = ""
         self.host = ""
         self.socket = socket(AF_INET,SOCK_STREAM)
         self.header = ""
         self.FileName = ""
         self.data = ""
-        self.pathdown =  "/Users/JarHan/Downloads"
         self.numConn = 5
         self.content_length = 0
         self.port = 80
@@ -33,30 +32,32 @@ class Downloader():
         temp = argument[-1]
         url = urlparse(temp)
         self.host = url.hostname
-        self.path = url.path
-        # if temp_url.split():
-        #     self.DefaultPort = temp_url.split(":")[-1]
-        # else:
+        self.pathdown = url.path
 
     def recv(self):
         data = ""
+        header = ""
         print "Start Receiving file"
         while True:
-            print "entering loop"
-            buff = self.socket.recv(4068)
-            print buff
-            if not buff:
+            print "Loop entering"
+            buff = self.socket.recv(1024)
+            header += buff
+            if "\r\n\r\n" in header:
+                print "kao if nhoi si"
+                self.header, leftover =   header.split("\r\n\r\n")
+                data += leftover
+                print self.header
+                break
+        while True:
+            data_buff = self.socket.recv(1024)
+            if not data_buff:
                 print "exiting loop"
                 break
-            data += buff
-            split = data.split("\r\n\r\n")
-            leftover = split[-1]
-            data += leftover
-        header = split[0]
-        print "Data is" + data
-        self.header = header
-        # self.data = data.split("\r\n\r\n")[-1]
-        # self.header = data.split("\r\n\r\n")[0]
+            data += data_buff
+        with open((self.FileName), 'wb+') as f:
+            f.write(data)
+            print "Data is" + data
+            f.close()
         self.socket.close()
 
     # def datasize (self):
@@ -80,7 +81,7 @@ class Downloader():
         s.send_request()
         s.recv()
         s.datasize()
-        s.file_write()
+        # s.file_write()
 
 if __name__ == '__main__':
     start = sys.argv
@@ -90,3 +91,4 @@ if __name__ == '__main__':
 
 
 
+# with ()
