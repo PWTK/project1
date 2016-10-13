@@ -54,14 +54,14 @@ class Downloader():
             if "Content-Length" in self.header:
                 self.datasize()
                 data_total = len(leftover)
-                # print self.content_length, data_total
+                print self.content_length, data_total
 
                 while self.content_length > data_total:
                     data_buff = self.socket.recv(8096)
                     f.write(data_buff)
 
                     data_total += len(data_buff)
-                    # print data_total
+                    print data_total
                 f.close()
             else:
                 total = 0
@@ -92,6 +92,8 @@ class Downloader():
         s.send_request()
         s.recv()
 
+    def continue(self,argument):
+        if argument == ""
 
 if __name__ == '__main__':
     start = sys.argv
