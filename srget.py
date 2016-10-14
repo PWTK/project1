@@ -5,6 +5,10 @@ from urlparse import urlparse
 
 class Downloader():
     def __init__(self):
+        self.file_etag = ""
+        self.file_last_modified = ""
+        self.current_byte = ""
+        self.file_content_length = 0
         self.extension = ""
         self.ETAG = ""
         self.pathdown = ""
@@ -37,6 +41,7 @@ class Downloader():
     def input_splitter(self,argument):
         self.file_name , self.extension = argument[2].split(".")
         print "Saving the file as: " + self.file_name + "." + self.extension
+        print self.file_name
         temp = argument[-1]
         url = urlparse(temp)
         if url.port != None:
@@ -66,6 +71,7 @@ class Downloader():
                 data_total = len(self.leftover)
                 m.write(self.ETAG + "\r\n")
                 m.write(self.last_modified + "\r\n")
+                m.write(str(self.content_length) + "r\n")
                 while self.content_length > data_total:
                     data_buff = self.socket.recv(8096)
                     f.write(data_buff)
@@ -79,8 +85,8 @@ class Downloader():
                 print "Download Complete"
 
             else:
-                print "Server do not support resume"
-                print "Start downloading from the beginning "
+                # print "Server do not support resume"
+                # print "Start downloading from the beginning "
                 total = 0
                 while True:
                     data_buff = self.socket.recv(8096)
@@ -104,22 +110,34 @@ class Downloader():
                 self.ETAG = fields.split(":")[-1]
             if "Content-Length" in fields:
                 self.content_length = int(fields.split(":")[-1])
-                print "con len: ", self.content_length
+                # print "con len: ", self.content_length
             if "Last-Modified" in fields:
                 # self.last_modified = fields.split(":")[-1]
                 lastmod = fields.split("Last-Modified: ")
-                print "last mod: ",lastmod
+                # print "last mod: ",lastmod
                 self.last_modified = lastmod[-1]
-                print "self: ", self.last_modified
+                # print "self: ", self.last_modified
 
     def check_continue(self):
         self.file_path = os.path.realpath(__file__).split(__file__)[0]
+        self.file_name
+        print "check mai i sus"
+        print self.file_name
+        print self.file_path
         return os.path.isfile(self.file_path+self.file_name+".pam")
 
+
     def read_file(self):
-        file = open((self.file_name + "_meta.txt") ,'r')
-        file.read()
-        print "file readreadread" + file.read()
+        with open(self.file_name + "_meta.txt",'r') as f:
+            array = []
+            for line in f:
+                array.append(line.split("\r\n")[0])
+            self.current_byte = array[-1]
+            self.file_etag = array[0]
+            self.file_last_modified = array[1]
+    def header_cmp (self):
+        return self.file_last_modified != self.last_modified or self.file_etag != self.ETAG or self.file_content_length != self.content_length
+
 
     def send_resume_head(self):
         resume_head = "GET " + self.pathdown + " HTTP/1.1\r\n" + "Host: " + self.host + "\r\n" + "Range: bytes=" + self.current_byte + "-" +str(self.content_length) + "\r\n\r\n"
@@ -127,10 +145,13 @@ class Downloader():
     def down_execution(self,argument):
         s = Downloader()
         s.input_splitter(argument)
+        print self.check_continue()
         if self.check_continue():
+            print "Old file have been found, trying to resume"
             s.connect()
             s.read_file()
             s.send_connection_request()
+            s.get_header()
             if self.content_length == None or self.content_length not in self.header:
                 print "Server does not support resuming"
                 print "Redownloading the file"
@@ -139,10 +160,21 @@ class Downloader():
                 s.disconnect()
             else:
                 s.disconnect()
-                s.connect()
-                s.readfile()
+                s.connect
                 s.send_resume_head()
                 s.get_header()
+                s.head_split()
+                if s.header_cmp():
+                    print "File has been changed, start redownloading"
+                    s.connect()
+                    s.send_connection_request()
+                    s.get_header()
+                    s.recv()
+                    s.disconnect()
+                else:
+                    s.recv()
+                    s.disconnect()
+
 
 
         else:
@@ -150,12 +182,7 @@ class Downloader():
             s.send_connection_request()
             s.get_header()
             s.recv()
-            s.read_file()
             s.disconnect()
-    #
-    # def rename(self):
-    #     with open((self.FileName),'wb+') as f:
-    #
 
 
 
