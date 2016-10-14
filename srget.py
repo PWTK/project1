@@ -22,6 +22,7 @@ class Downloader():
         self.current_path = os.path.realpath(__file__)
         self.current_byte = ""
         self.resume_field = {}
+        self.file_path = ""
 
     def connect(self):
         self.socket = socket(AF_INET,SOCK_STREAM)
@@ -35,7 +36,7 @@ class Downloader():
 
     def input_splitter(self,argument):
         self.file_name , self.extension = argument[2].split(".")
-        print "Saving the file as: " + self.file_name
+        print "Saving the file as: " + self.file_name + "." + self.extension
         temp = argument[-1]
         url = urlparse(temp)
         if url.port != None:
@@ -74,8 +75,9 @@ class Downloader():
                 f.close()
                 os.rename(self.file_name + ".pam",self.file_name + "."+self.extension)
                 m.close()
+                os.remove(self.file_path+self.file_name + "_meta.txt")
                 print "Download Complete"
-                
+
             else:
                 print "Server do not support resume"
                 print "Start downloading from the beginning "
@@ -111,8 +113,8 @@ class Downloader():
                 print "self: ", self.last_modified
 
     def check_continue(self):
-        file_path = os.path.realpath(__file__).split(__file__)[0]
-        return os.path.isfile(file_path+self.file_name+".pam")
+        self.file_path = os.path.realpath(__file__).split(__file__)[0]
+        return os.path.isfile(self.file_path+self.file_name+".pam")
 
     def read_file(self):
         file = open((self.file_name + "_meta.txt") ,'r')
@@ -144,11 +146,11 @@ class Downloader():
 
 
         else:
-            print "gu yoo nie"
             s.connect()
             s.send_connection_request()
             s.get_header()
             s.recv()
+            s.read_file()
             s.disconnect()
     #
     # def rename(self):
