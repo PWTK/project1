@@ -63,7 +63,7 @@ class Downloader():
                 break
 
     def recv(self):
-        with open((self.file_name + ".pam"), 'wb+') as f, open((self.file_name + "_meta.txt") ,'w') as m:
+        with open((self.file_name + ".pam"), 'ab+') as f, open((self.file_name + "_meta.txt") ,'w') as m:
 
             f.write(self.leftover)
             if "Content-Length" in self.header:
