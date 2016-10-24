@@ -164,51 +164,6 @@ class Downloader():
                     print "Download Complete"
             sys.exit()
 
-    # def download(self,argument):
-    #     print "yo"
-    #     if argument == "download":
-    #         file_con_length = self.content_length
-    #         typefile = 'w'
-    #         byte_continue = 0
-    #     elif argument == "Resume":
-    #         file_con_length = self.file_content_length
-    #         typefile = 'a'
-    #         byte_continue = int(self.current_byte)
-    #     with open((self.file_name + ".pam"), typefile) as f, open((self.file_name + "_meta.txt"), "w") as m:
-    #         f.write(self.leftover)
-    #         if "Content-Length" in self.header:
-    #             if argument == "download":
-    #                 self.head_split()
-    #             data_total = len(self.leftover) + byte_continue
-    #             m.write(self.current_ETAG + "\r\n")
-    #             m.write(self.current_last_modified + "\r\n")
-    #             m.write(str(file_con_length) + "\r\n")
-    #
-    #             while file_con_length > data_total:
-    #                 data_buff = self.socket.recv(8096)
-    #                 f.write(data_buff)
-    #                 data_total += len(data_buff)
-    #                 m.write(str(data_total) + "\r\n")
-    #             print "sedleao"
-    #             f.close()
-    #             m.close()
-    #             os.rename(self.file_name + ".pam", self.file_name + "." + self.extension)
-    #             os.remove(self.file_path + self.file_name + "_meta.txt")
-    #             print "Download Complete"
-    #         else:
-    #             # print "Server do not support resume"
-    #             # print "Start downloading from the beginning "
-    #             total = 0
-    #             while True:
-    #                 data_buff = self.socket.recv(8096)
-    #                 if not data_buff:
-    #                     print "exiting loop"
-    #                     break
-    #                 total += len(data_buff)
-    #                 f.write(data_buff)
-    #         print "Download Complete"
-    #         sys.exit()
-
     def check_continue(self):
         return os.path.isfile(self.file_path+self.file_name+"_meta.txt")
 
